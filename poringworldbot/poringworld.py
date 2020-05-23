@@ -30,6 +30,10 @@ class Item:
             json=json_dct,
         )
 
+    @property
+    def icon_url(self):
+        return f"https://www.poring.world/sprites/{self.icon}.png"
+
 
 async def get(
         query: typing.Optional[str] = None,

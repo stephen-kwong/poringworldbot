@@ -1,3 +1,4 @@
+from discord import Embed
 from discord.ext import commands
 
 from . import poringworld
@@ -13,7 +14,7 @@ async def on_ready():
 
 
 @bot.command()
-async def echo(ctx, *, arg):
+async def echo(ctx: commands.Context, *, arg: str):
     """
     Test command to see if the bot is alive.
     """
@@ -21,7 +22,7 @@ async def echo(ctx, *, arg):
 
 
 @bot.command(name='pc')
-async def price_check(ctx, *, arg):
+async def price_check(ctx: commands.Context, *, arg: str):
     """
     Price check an item.
     """
@@ -32,13 +33,12 @@ async def price_check(ctx, *, arg):
     if not items:
         await ctx.send(f"Unable to find a price for: {arg}")
     else:
-        msg = "```\n"
-        for item in items[:1]:
-            price = '{:20,d}'.format(item.price).lstrip()
-            msg += f"Name: {item.name}\nPrice: {price}\nStock: {item.stock}\n"
-        for item in items[1:]:
-            msg += '\n'
-            price = '{:20,d}'.format(item.price).lstrip()
-            msg += f"Name: {item.name}\nPrice: {price}\nStock: {item.stock}\n"
-        msg += "```"
-        await ctx.send(msg)
+        for item in items:
+            await ctx.send(embed=to_embed(item))
+
+
+def to_embed(item: poringworld.Item) -> Embed:
+    return Embed(
+        title=item.name,
+        description=f"Price: {'{:20,d}'.format(item.price).lstrip()}\nStock: {item.stock}"
+    ).set_thumbnail(url=item.icon_url)
