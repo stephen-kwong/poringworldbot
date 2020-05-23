@@ -18,23 +18,23 @@ async def on_ready() -> None:
 
 
 @bot.command()
-async def echo(ctx: commands.Context, *, arg: str) -> None:
+async def echo(ctx: commands.Context, *, msg: str) -> None:
     """
     Test command to see if the bot is alive.
     """
-    await ctx.send(arg)
+    await ctx.send(msg)
 
 
 @bot.command(name='pc')
-async def price_check(ctx: commands.Context, *, arg: str) -> None:
+async def price_check(ctx: commands.Context, *, item_name: str) -> None:
     """
     Price check an item.
     """
     # Try in stock items first as the query is faster.
-    logger.info("Checking price for %s", arg)
+    logger.info("Checking price for %s", item_name)
     try:
         items = await poringworld.get(
-            query=arg,
+            query=item_name,
             in_stock=1,
             modified=0,
             limit=PRICE_CHECK_ITEM_LIMIT,
@@ -44,7 +44,7 @@ async def price_check(ctx: commands.Context, *, arg: str) -> None:
         # If we don't find any items in stock then try out of stock
         if not items:
             items = await poringworld.get(
-                query=arg,
+                query=item_name,
                 in_stock=0,
                 modified=0,
                 limit=PRICE_CHECK_ITEM_LIMIT,
@@ -55,7 +55,7 @@ async def price_check(ctx: commands.Context, *, arg: str) -> None:
         return
 
     if not items:
-        await ctx.send(f"Unable to find a price for: {arg}")
+        await ctx.send(f"Unable to find a price for: {item_name}")
     else:
         for item in items:
             await ctx.send(embed=to_embed(item))
@@ -67,10 +67,10 @@ def to_embed(item: poringworld.Item) -> Embed:
     """
     def get_color_from_price_change():
         if item.price_change_1d > 0:
-            return 0x00ff00
+            return 0x00ff00  # green
         if item.price_change_1d < 0:
-            return 0xff0000
-        return 0x000000
+            return 0xff0000  # red
+        return 0x000000  # black
 
     return Embed(
         title=item.name,
