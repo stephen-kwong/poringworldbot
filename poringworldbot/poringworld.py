@@ -1,8 +1,14 @@
 import dataclasses
+import http
 import typing
 import urllib.parse
 
 import aiohttp
+
+
+class PoringWorldApiException(Exception):
+    def __init__(self, status):
+        self.status = status
 
 
 @dataclasses.dataclass
@@ -64,6 +70,8 @@ async def get(
 
     async with aiohttp.ClientSession() as session:
         async with session.get(f"{url}?{urllib.parse.urlencode(params)}") as resp:
+            if resp.status != http.HTTPStatus.OK:
+                raise PoringWorldApiException(resp.status)
             content = await resp.json()
 
             if not limit:

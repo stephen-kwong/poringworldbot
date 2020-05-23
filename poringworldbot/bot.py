@@ -32,23 +32,27 @@ async def price_check(ctx: commands.Context, *, arg: str) -> None:
     """
     # Try in stock items first as the query is faster.
     logger.info("Checking price for %s", arg)
-    items = await poringworld.get(
-        query=arg,
-        in_stock=1,
-        modified=0,
-        limit=PRICE_CHECK_ITEM_LIMIT,
-        order='price',
-    )
-
-    # If we don't find any items in stock then try out of stock
-    if not items:
+    try:
         items = await poringworld.get(
             query=arg,
-            in_stock=0,
+            in_stock=1,
             modified=0,
             limit=PRICE_CHECK_ITEM_LIMIT,
             order='price',
         )
+
+        # If we don't find any items in stock then try out of stock
+        if not items:
+            items = await poringworld.get(
+                query=arg,
+                in_stock=0,
+                modified=0,
+                limit=PRICE_CHECK_ITEM_LIMIT,
+                order='price',
+            )
+    except poringworld.PoringWorldApiException:
+        await ctx.send("Unable to retrieve data from poring.world. Please try again later :(")
+        return
 
     if not items:
         await ctx.send(f"Unable to find a price for: {arg}")
