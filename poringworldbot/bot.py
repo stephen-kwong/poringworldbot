@@ -9,7 +9,7 @@ PRICE_CHECK_ITEM_LIMIT = 5
 
 bot = commands.Bot(command_prefix='$pw ')
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 @bot.event
@@ -31,6 +31,7 @@ async def price_check(ctx: commands.Context, *, arg: str) -> None:
     Price check an item.
     """
     # Try in stock items first as the query is faster.
+    logger.info("Checking price for %s", arg)
     items = await poringworld.get(
         query=arg,
         in_stock=1,
@@ -60,7 +61,17 @@ def to_embed(item: poringworld.Item) -> Embed:
     """
     Convert an poring world Item into a Discord embed.
     """
+    def get_color_from_price_change():
+        if item.price_change_1d > 0:
+            return 0x00ff00
+        if item.price_change_1d < 0:
+            return 0xff0000
+        return 0x000000
+
     return Embed(
         title=item.name,
-        description=f"Price: {'{:20,d}'.format(item.price).lstrip()}\nStock: {item.stock}"
+        description=f"Price: {'{:20,d}'.format(item.price).lstrip()}"
+                    f"\nStock: {item.stock}"
+                    f"\nChange(1d): {item.price_change_1d:.1f}%",
+        color=get_color_from_price_change(),
     ).set_thumbnail(url=item.icon_url)

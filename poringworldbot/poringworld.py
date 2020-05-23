@@ -13,6 +13,7 @@ class Item:
     name: str
     price: int
     stock: int
+    price_change_1d: float
     json: dict
 
     @classmethod
@@ -25,6 +26,7 @@ class Item:
             name=json_dct['name'],
             price=json_dct['lastRecord']['price'],
             stock=json_dct['lastRecord']['stock'],
+            price_change_1d=json_dct['priceChange1d'],
             json=json_dct,
         )
 
