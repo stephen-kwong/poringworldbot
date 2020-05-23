@@ -14,11 +14,17 @@ async def on_ready():
 
 @bot.command()
 async def echo(ctx, *, arg):
+    """
+    Test command to see if the bot is alive.
+    """
     await ctx.send(arg)
 
 
 @bot.command(name='pc')
 async def price_check(ctx, *, arg):
+    """
+    Price check an item.
+    """
     items = await poringworld.get(query=arg, in_stock=1, modified=0, limit=PRICE_CHECK_ITEM_LIMIT, order='price')
     if not items:
         items = await poringworld.get(query=arg, in_stock=0, modified=0, limit=PRICE_CHECK_ITEM_LIMIT, order='price')
