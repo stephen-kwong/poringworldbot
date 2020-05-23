@@ -1,11 +1,8 @@
 import dataclasses
-import logging
 import typing
 import urllib.parse
 
 import aiohttp
-
-logger = logging.getLogger()
 
 
 @dataclasses.dataclass
@@ -20,6 +17,7 @@ class Item:
 
     @classmethod
     def from_json_dict(cls, json_dct: dict) -> 'Item':
+        """Convert an object from poring worlds api response to an item."""
         return cls(
             id=json_dct['id'],
             item_id=json_dct['itemId'],
@@ -32,6 +30,7 @@ class Item:
 
     @property
     def icon_url(self):
+        """The url to the icon of this item."""
         return f"https://www.poring.world/sprites/{self.icon}.png"
 
 
@@ -41,7 +40,17 @@ async def get(
         in_stock: typing.Optional[int] = None,
         modified: typing.Optional[int] = None,
         limit: typing.Optional[int] = None,
-):
+) -> typing.List[Item]:
+    """
+    Make a query to poring world's API.
+
+    :param query: String to search the API for.
+    :param order: How to order search results. Defaults to 'popularity'
+    :param in_stock: 1 for in stock items only. 0 for out of stock. None for both.
+    :param modified: 1 for items that have been refined/enchanted. 0 for not refined/enchanted. None for both.
+    :param limit: Limit the number of results.
+    :return: The results from poring world converted to Items
+    """
     url = 'https://poring.world/api/search'
     params = dict(
         order=order or 'popularity',
@@ -52,7 +61,6 @@ async def get(
         params['q'] = query
 
     async with aiohttp.ClientSession() as session:
-        logging.debug(f"url: {url}?{urllib.parse.urlencode(params)}")
         async with session.get(f"{url}?{urllib.parse.urlencode(params)}") as resp:
             content = await resp.json()
 

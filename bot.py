@@ -1,6 +1,10 @@
+import logging
 import os
 
 from poringworldbot.bot import bot
+
+logging.basicConfig()
+logging.getLogger('poringworldbot').setLevel(logging.INFO)
 
 token = os.environ.get('DISCORD_TOKEN')
 
