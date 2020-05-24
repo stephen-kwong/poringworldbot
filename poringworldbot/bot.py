@@ -25,7 +25,7 @@ async def echo(ctx: commands.Context, *, msg: str) -> None:
     await ctx.send(msg)
 
 
-@bot.command(name='pc')
+@bot.command(aliases=['pc'])
 async def price_check(ctx: commands.Context, *, item_name: str) -> None:
     """
     Price check an item.
@@ -74,8 +74,10 @@ def to_embed(item: poringworld.Item) -> Embed:
 
     return Embed(
         title=item.name,
-        description=f"Price: {'{:20,d}'.format(item.price).lstrip()}"
-                    f"\nStock: {item.stock}"
-                    f"\nChange(1d): {item.price_change_1d:.1f}%",
+        description=f"Price: **{'{:20,d}'.format(item.price).lstrip()}** z"
+                    f"\nStock: **{item.stock}**"
+                    f"\nChange (1d): **{item.price_change_1d:.1f}**%"
+                    f"\nChange (3d): **{item.price_change_3d:.1f}**%"
+                    f"\nChange (7d): **{item.price_change_7d:.1f}**%",
         color=get_color_from_price_change(),
     ).set_thumbnail(url=item.icon_url)
